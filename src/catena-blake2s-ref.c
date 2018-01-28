@@ -144,7 +144,7 @@ static inline void blake2round(blake2s_state* S,
   int i;
 
   for( i = 0; i < 16; ++i ) {
-    m[i] = load32( in + i * sizeof( m[i] ) );
+    m[i] = load32( block + i * sizeof( m[i] ) );
   }
 
   for( i = 0; i < 8; ++i )
