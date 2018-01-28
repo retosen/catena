@@ -1,5 +1,5 @@
 #include "catena.h"
-//Loading in blake2b is faster on little endian
+//Loading in blake2s is faster on little endian
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 #ifndef NATIVE_LITTLE_ENDIAN
   #define NATIVE_LITTLE_ENDIAN
@@ -11,17 +11,17 @@
 #include "blake2-ref/blake2-impl.h"
 
 #ifdef FAST
-static blake2b_state _state;
+static blake2s_state _state;
 #endif
 
 
 inline void __Hash1(const uint8_t *input, const uint32_t inputlen,
 		      uint8_t hash[H_LEN])
 {
-  blake2b_state ctx;
-  blake2b_init(&ctx,H_LEN);
-  blake2b_update(&ctx, input, inputlen);
-  blake2b_final(&ctx, hash, H_LEN);
+  blake2s_state ctx;
+  blake2s_init(&ctx,H_LEN);
+  blake2s_update(&ctx, input, inputlen);
+  blake2s_final(&ctx, hash, H_LEN);
 }
 
 
@@ -31,11 +31,11 @@ inline void __Hash2(const uint8_t *i1, const uint8_t i1len,
 		    const uint8_t *i2, const uint8_t i2len,
 		    uint8_t hash[H_LEN])
 {
-  blake2b_state ctx;
-  blake2b_init(&ctx,H_LEN);
-  blake2b_update(&ctx, i1, i1len);
-  blake2b_update(&ctx, i2, i2len);
-  blake2b_final(&ctx, hash, H_LEN);
+  blake2s_state ctx;
+  blake2s_init(&ctx,H_LEN);
+  blake2s_update(&ctx, i1, i1len);
+  blake2s_update(&ctx, i2, i2len);
+  blake2s_final(&ctx, hash, H_LEN);
 }
 
 
@@ -47,12 +47,12 @@ inline void __Hash3(const uint8_t *i1, const uint8_t i1len,
 		    const uint8_t *i3, const uint8_t i3len,
 		    uint8_t hash[H_LEN])
 {
-  blake2b_state ctx;
-  blake2b_init(&ctx,H_LEN);
-  blake2b_update(&ctx, i1, i1len);
-  blake2b_update(&ctx, i2, i2len);
-  blake2b_update(&ctx, i3, i3len);
-  blake2b_final(&ctx, hash, H_LEN);
+  blake2s_state ctx;
+  blake2s_init(&ctx,H_LEN);
+  blake2s_update(&ctx, i1, i1len);
+  blake2s_update(&ctx, i2, i2len);
+  blake2s_update(&ctx, i3, i3len);
+  blake2s_final(&ctx, hash, H_LEN);
 }
 
 /***************************************************/
@@ -63,13 +63,13 @@ inline void __Hash4(const uint8_t *i1, const uint8_t i1len,
 		     const uint8_t *i4, const uint8_t i4len,
 		    uint8_t hash[H_LEN])
 {
-  blake2b_state ctx;
-  blake2b_init(&ctx,H_LEN);
-  blake2b_update(&ctx, i1, i1len);
-  blake2b_update(&ctx, i2, i2len);
-  blake2b_update(&ctx, i3, i3len);
-  blake2b_update(&ctx, i4, i4len);
-  blake2b_final(&ctx, hash, H_LEN);
+  blake2s_state ctx;
+  blake2s_init(&ctx,H_LEN);
+  blake2s_update(&ctx, i1, i1len);
+  blake2s_update(&ctx, i2, i2len);
+  blake2s_update(&ctx, i3, i3len);
+  blake2s_update(&ctx, i4, i4len);
+  blake2s_final(&ctx, hash, H_LEN);
 }
 
 
@@ -82,23 +82,23 @@ inline void __Hash5(const uint8_t *i1, const uint8_t i1len,
 		    const uint8_t *i5, const uint8_t i5len,
 		    uint8_t hash[H_LEN])
 {
-  blake2b_state ctx;
-  blake2b_init(&ctx,H_LEN);
-  blake2b_update(&ctx, i1, i1len);
-  blake2b_update(&ctx, i2, i2len);
-  blake2b_update(&ctx, i3, i3len);
-  blake2b_update(&ctx, i4, i4len);
-  blake2b_update(&ctx, i5, i5len);
-  blake2b_final(&ctx, hash, H_LEN);
+  blake2s_state ctx;
+  blake2s_init(&ctx,H_LEN);
+  blake2s_update(&ctx, i1, i1len);
+  blake2s_update(&ctx, i2, i2len);
+  blake2s_update(&ctx, i3, i3len);
+  blake2s_update(&ctx, i4, i4len);
+  blake2s_update(&ctx, i5, i5len);
+  blake2s_final(&ctx, hash, H_LEN);
 }
 
 /***************************************************/
 
 #ifdef FAST
-/* Copies of necessary parts of blake2b-sse, that aren't directly accessible
+/* Copies of necessary parts of blake2s-sse, that aren't directly accessible
  */
 
-static const uint64_t blake2b_IV[8] =
+static const uint64_t blake2s_IV[8] =
 {
   0x6a09e667f3bcc908ULL, 0xbb67ae8584caa73bULL,
   0x3c6ef372fe94f82bULL, 0xa54ff53a5f1d36f1ULL,
@@ -106,7 +106,7 @@ static const uint64_t blake2b_IV[8] =
   0x1f83d9abfb41bd6bULL, 0x5be0cd19137e2179ULL
 };
 
-static const uint8_t blake2b_sigma[12][16] =
+static const uint8_t blake2s_sigma[12][16] =
 {
   {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 } ,
   { 14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3 } ,
@@ -122,7 +122,7 @@ static const uint8_t blake2b_sigma[12][16] =
   { 14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3 }
 };
 
-static inline int blake2b_increment_counter( blake2b_state *S, const uint64_t inc )
+static inline int blake2s_increment_counter( blake2s_state *S, const uint64_t inc )
 {
   S->t[0] += inc;
   S->t[1] += ( S->t[0] < inc );
@@ -130,9 +130,9 @@ static inline int blake2b_increment_counter( blake2b_state *S, const uint64_t in
 }
 
 
-static inline int blake2b_set_lastblock( blake2b_state *S )
+static inline int blake2s_set_lastblock( blake2s_state *S )
 {
-  // if( S->last_node ) blake2b_set_lastnode( S );
+  // if( S->last_node ) blake2s_set_lastnode( S );
 
   S->f[0] = ~0ULL;
   return 0;
@@ -140,7 +140,7 @@ static inline int blake2b_set_lastblock( blake2b_state *S )
 
 /* Blake2b compression function modified to do only one single round
  */
-static inline void blake2round(blake2b_state* S, 
+static inline void blake2round(blake2s_state* S,
     const uint8_t block[BLAKE2B_BLOCKBYTES], unsigned ridx)
 {
   uint64_t m[16];
@@ -153,21 +153,21 @@ static inline void blake2round(blake2b_state* S,
   for( i = 0; i < 8; ++i )
     v[i] = S->h[i];
 
-  v[ 8] = blake2b_IV[0];
-  v[ 9] = blake2b_IV[1];
-  v[10] = blake2b_IV[2];
-  v[11] = blake2b_IV[3];
-  v[12] = S->t[0] ^ blake2b_IV[4];
-  v[13] = S->t[1] ^ blake2b_IV[5];
-  v[14] = S->f[0] ^ blake2b_IV[6];
-  v[15] = S->f[1] ^ blake2b_IV[7];
+  v[ 8] = blake2s_IV[0];
+  v[ 9] = blake2s_IV[1];
+  v[10] = blake2s_IV[2];
+  v[11] = blake2s_IV[3];
+  v[12] = S->t[0] ^ blake2s_IV[4];
+  v[13] = S->t[1] ^ blake2s_IV[5];
+  v[14] = S->f[0] ^ blake2s_IV[6];
+  v[15] = S->f[1] ^ blake2s_IV[7];
 #define G(r,i,a,b,c,d) \
   do { \
-    a = a + b + m[blake2b_sigma[r][2*i+0]]; \
+    a = a + b + m[blake2s_sigma[r][2*i+0]]; \
     d = rotr64(d ^ a, 32); \
     c = c + d; \
     b = rotr64(b ^ c, 24); \
-    a = a + b + m[blake2b_sigma[r][2*i+1]]; \
+    a = a + b + m[blake2s_sigma[r][2*i+1]]; \
     d = rotr64(d ^ a, 16); \
     c = c + d; \
     b = rotr64(b ^ c, 63); \
@@ -198,7 +198,7 @@ static inline void blake2round(blake2b_state* S,
     case 10:ROUND( 10 );break;
     case 11:ROUND( 11 );break;
   }
-  
+
  for( i = 0; i < 8; ++i )
     S->h[i] = S->h[i] ^ v[i] ^ v[i + 8];
 
@@ -210,19 +210,19 @@ static inline void blake2round(blake2b_state* S,
 *  The round that is used is determined by the current vertex index(vindex).
 *  A single state is used for every consecutive call.
 */
-void __HashFast(int vindex, const uint8_t* i1, 
+void __HashFast(int vindex, const uint8_t* i1,
        const uint8_t* i2, uint8_t hash[H_LEN]){
   uint8_t buffer[BLAKE2B_OUTBYTES];
 
   memcpy(_state.buf, i1, H_LEN);
   memcpy(_state.buf + H_LEN, i2, H_LEN);
   _state.buflen = 128;
-  blake2b_increment_counter(&_state, _state.buflen);
-  blake2b_set_lastblock(&_state);
+  blake2s_increment_counter(&_state, _state.buflen);
+  blake2s_set_lastblock(&_state);
   //No Padding necessary because the last 1024bits of _state.buf are 0 anyways
   const int rindex = vindex % 12;
   blake2round(&_state, _state.buf, rindex);
-  
+
   for( int i = 0; i < 8; ++i ) /* Output full hash to temp buffer */
     store64( buffer + sizeof(_state.h[i] ) * i, _state.h[i] );
 
@@ -230,13 +230,13 @@ void __HashFast(int vindex, const uint8_t* i1,
 }
 
 void __ResetState(void){
-  blake2b_init(&_state,H_LEN);
+  blake2s_init(&_state,H_LEN);
 }
 
 #else
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-void __HashFast(int vindex, const uint8_t* i1, 
+void __HashFast(int vindex, const uint8_t* i1,
        const uint8_t* i2, uint8_t hash[H_LEN]){
   __Hash2(i1, H_LEN, i2, H_LEN, hash);
 }

@@ -15,8 +15,8 @@
 /* The default unit for all length values are bytes */
 
 /* Recommended default values */
-#define H_LEN      64
-#define KEY_LEN    16
+#define H_LEN      32
+#define KEY_LEN    8
 /* Default values depending on instance*/
 extern const uint8_t LAMBDA;
 extern const uint8_t GARLIC;
