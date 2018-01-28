@@ -17,10 +17,10 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "blake2-sse/blake2.h"
-#include "blake2-sse/blake2-impl.h"
+#include "blake2.h"
+#include "blake2-impl.h"
 
-#include "blake2-sse/blake2-config.h"
+#include "blake2-config.h"
 
 
 #include <emmintrin.h>
@@ -37,7 +37,7 @@
 #include <x86intrin.h>
 #endif
 
-#include "blake2-sse/blake2s-round.h"
+#include "blake2s-round.h"
 
 static const uint32_t blake2s_IV[8] =
 {

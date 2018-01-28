@@ -1,12 +1,12 @@
 
-all: blake2b
+all: blake2s
 
-blake2b:
-	cd src; make $@; cd 
+blake2s:
+	cd src; make $@; cd
 
 clean:
 	cd src;	make clean; cd ..
-	rm -f *~ catena-Dragonfly-blake2b-test
-	rm -f catena-Butterfly-blake2b-test
-	rm -f catena-Dragonfly-blake2b-test_vectors
-	rm -f catena-Butterfly-blake2b-test_vectors
+	rm -f *~ catena-Dragonfly-blake2s-test
+	rm -f catena-Butterfly-blake2s-test
+	rm -f catena-Dragonfly-blake2s-test_vectors
+	rm -f catena-Butterfly-blake2s-test_vectors

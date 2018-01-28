@@ -4,7 +4,7 @@
 
 #include "catena.h"
 
-#define SALT_LEN 16
+#define SALT_LEN 8
 
 void print_hex(uint8_t *key, int len)
 {
@@ -16,7 +16,7 @@ void print_hex(uint8_t *key, int len)
 
 int main()
 {
-  const size_t hashlen = 64;
+  const size_t hashlen = 32;
   const uint8_t salt[SALT_LEN]=
     {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
      0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0XFF};
