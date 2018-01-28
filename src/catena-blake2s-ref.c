@@ -98,15 +98,13 @@ inline void __Hash5(const uint8_t *i1, const uint8_t i1len,
 /* Copies of necessary parts of blake2s-sse, that aren't directly accessible
  */
 
-static const uint64_t blake2s_IV[8] =
-{
-  0x6a09e667f3bcc908ULL, 0xbb67ae8584caa73bULL,
-  0x3c6ef372fe94f82bULL, 0xa54ff53a5f1d36f1ULL,
-  0x510e527fade682d1ULL, 0x9b05688c2b3e6c1fULL,
-  0x1f83d9abfb41bd6bULL, 0x5be0cd19137e2179ULL
-};
+ static const uint32_t blake2s_IV[8] =
+ {
+   0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL, 0xA54FF53AUL,
+   0x510E527FUL, 0x9B05688CUL, 0x1F83D9ABUL, 0x5BE0CD19UL
+ };
 
-static const uint8_t blake2s_sigma[12][16] =
+static const uint8_t blake2s_sigma[10][16] =
 {
   {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 } ,
   { 14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3 } ,
@@ -118,8 +116,6 @@ static const uint8_t blake2s_sigma[12][16] =
   { 13, 11,  7, 14, 12,  1,  3,  9,  5,  0, 15,  4,  8,  6,  2, 10 } ,
   {  6, 15, 14,  9, 11,  3,  0,  8, 12,  2, 13,  7,  1,  4, 10,  5 } ,
   { 10,  2,  8,  4,  7,  6,  1,  5, 15, 11,  9, 14,  3, 12, 13 , 0 } ,
-  {  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 } ,
-  { 14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3 }
 };
 
 static inline int blake2s_increment_counter( blake2s_state *S, const uint64_t inc )
@@ -132,9 +128,9 @@ static inline int blake2s_increment_counter( blake2s_state *S, const uint64_t in
 
 static inline int blake2s_set_lastblock( blake2s_state *S )
 {
-  // if( S->last_node ) blake2s_set_lastnode( S );
+  //if( S->last_node ) blake2s_set_lastnode( S );
 
-  S->f[0] = ~0ULL;
+  S->f[0] = (uint32_t)-1;
   return 0;
 }
 
@@ -147,8 +143,9 @@ static inline void blake2round(blake2s_state* S,
   uint64_t v[16];
   int i;
 
-  for( i = 0; i < 16; ++i )
-    m[i] = load64( block + i * sizeof( m[i] ) );
+  for( i = 0; i < 16; ++i ) {
+    m[i] = load32( in + i * sizeof( m[i] ) );
+  }
 
   for( i = 0; i < 8; ++i )
     v[i] = S->h[i];
@@ -161,17 +158,17 @@ static inline void blake2round(blake2s_state* S,
   v[13] = S->t[1] ^ blake2s_IV[5];
   v[14] = S->f[0] ^ blake2s_IV[6];
   v[15] = S->f[1] ^ blake2s_IV[7];
-#define G(r,i,a,b,c,d) \
-  do { \
-    a = a + b + m[blake2s_sigma[r][2*i+0]]; \
-    d = rotr64(d ^ a, 32); \
-    c = c + d; \
-    b = rotr64(b ^ c, 24); \
-    a = a + b + m[blake2s_sigma[r][2*i+1]]; \
-    d = rotr64(d ^ a, 16); \
-    c = c + d; \
-    b = rotr64(b ^ c, 63); \
-  } while(0)
+  #define G(r,i,a,b,c,d)                      \
+    do {                                      \
+      a = a + b + m[blake2s_sigma[r][2*i+0]]; \
+      d = rotr32(d ^ a, 16);                  \
+      c = c + d;                              \
+      b = rotr32(b ^ c, 12);                  \
+      a = a + b + m[blake2s_sigma[r][2*i+1]]; \
+      d = rotr32(d ^ a, 8);                   \
+      c = c + d;                              \
+      b = rotr32(b ^ c, 7);                   \
+    } while(0)
 #define ROUND(r)  \
   do { \
     G(r,0,v[ 0],v[ 4],v[ 8],v[12]); \
@@ -195,8 +192,8 @@ static inline void blake2round(blake2s_state* S,
     case 7:ROUND( 7 );break;
     case 8:ROUND( 8 );break;
     case 9:ROUND( 9 );break;
-    case 10:ROUND( 10 );break;
-    case 11:ROUND( 11 );break;
+  //  case 10:ROUND( 10 );break;
+  //  case 11:ROUND( 11 );break;
   }
 
  for( i = 0; i < 8; ++i )
@@ -216,7 +213,7 @@ void __HashFast(int vindex, const uint8_t* i1,
 
   memcpy(_state.buf, i1, H_LEN);
   memcpy(_state.buf + H_LEN, i2, H_LEN);
-  _state.buflen = 128;
+  _state.buflen = 64; //changed from 128
   blake2s_increment_counter(&_state, _state.buflen);
   blake2s_set_lastblock(&_state);
   //No Padding necessary because the last 1024bits of _state.buf are 0 anyways
