@@ -68,7 +68,7 @@ void Flap(const uint8_t x[H_LEN], const uint8_t lambda, const uint8_t garlic,
 
   /* Top row */
   initmem(x, c, r);
-  
+
   /*Gamma Function*/
   gamma(garlic, salt, saltlen, r);
 
