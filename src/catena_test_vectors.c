@@ -26,15 +26,12 @@ void test_output(const uint8_t *pwd,   const uint32_t pwdlen,
 		 const uint8_t garlic, const uint8_t hashlen)
 {
   uint8_t hash[hashlen];
-  uint8_t h1test[hashlen];
 
   uint8_t* pwdcpy = malloc(pwdlen);
   strncpy((char*)pwdcpy, (char*)pwd, pwdlen);
 
   Catena((uint8_t*)pwdcpy, pwdlen, salt, saltlen, data, datalen,
 	 LAMBDA, garlic, garlic, hashlen, hash);
-  __Hash1((uint8_t*)pwdcpy, pwdlen, h1test);
-  //__HashFast()
 
   print_hex("Password: ",pwd, pwdlen);
   print_hex("Salt: ",salt, saltlen);
@@ -42,7 +39,6 @@ void test_output(const uint8_t *pwd,   const uint32_t pwdlen,
   printf("Lambda:  %u\n",LAMBDA);
   printf("(Min-)Garlic:  %u\n",garlic);
   print_hex("\nOutput: ", hash, hashlen);
-  print_hex("\nBlake2s h1 test: " , h1test, hashlen);
   puts("\n\n");
 }
 

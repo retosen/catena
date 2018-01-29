@@ -18,10 +18,10 @@ int main()
 {
   const size_t hashlen = 32;
   const uint8_t salt[SALT_LEN]=
-    {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,};
+    {0x01, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77};
   uint8_t* password = malloc(9);
-  strncpy((char*)password, "Password", 9);
-  const char *data     = "";
+  strncpy((char*)password, "WHATTTTH", 9);
+  const char *data     = "This is a header";
   const uint8_t lambda = LAMBDA;
   const uint8_t min_garlic = GARLIC;
   const uint8_t garlic = GARLIC;

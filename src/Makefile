@@ -55,17 +55,15 @@ $(warning )
 endif
 
 
-.PHONY: all blake2s Butterfly Dragonfly clean
+.PHONY: all blake2s Butterfly  clean
 
 all: blake2s
 
-blake2s: Butterfly-blake2s Dragonfly-blake2s
+blake2s: Butterfly-blake2s 
 
 Butterfly: Butterfly-blake2s
-Dragonfly: Dragonfly-blake2s
 
 Butterfly-blake2s: catena-Butterfly-blake2s-test catena-Butterfly-blake2s-test_vectors
-Dragonfly-blake2s: catena-Dragonfly-blake2s-test catena-Dragonfly-blake2s-test_vectors
 
 
 catena-Butterfly-blake2s-test:
@@ -74,12 +72,6 @@ catena-Butterfly-blake2s-test:
 catena-Butterfly-blake2s-test_vectors:
 	$(CC) $(CFLAGS) -o $(TARGETDIR)/$@ catena_test_vectors.c $(BASEFILES) $(HASHIMPL) catena-DBG.c $(HASH)
 
-
-catena-Dragonfly-blake2s-test:
-	$(CC) $(CFLAGS) -o $(TARGETDIR)/$@ test-catena.c $(BASEFILES) $(HASHIMPL) catena-BRG.c $(HASH)
-
-catena-Dragonfly-blake2s-test_vectors:
-	$(CC) $(CFLAGS) -o $(TARGETDIR)/$@ catena_test_vectors.c $(BASEFILES) $(HASHIMPL) catena-BRG.c $(HASH)
 
 clean:
 	rm -f  *~ *.o
