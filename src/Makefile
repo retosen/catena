@@ -12,19 +12,19 @@ BASEFILES = catena.c catena-helpers.c
 SSE_TAGS = $(shell /bin/grep -m 1 flags /proc/cpuinfo | /bin/grep -o \
 	'sse2\|sse3\|ssse3\|sse4a\|sse4.1\|sse4.2' | sed  's/\_/./g')
 
-ifneq (${SSE_TAGS},)
+#ifneq (${SSE_TAGS},)
     #Choose optimized hash function
-    HDIR=./blake2-sse
-    CFLAGS += -L$(HDIR) -I$(HDIR)
-	HASH=$(HDIR)/blake2s.c
-	HASHIMPL = catena-blake2s-sse.c
-else
+#    HDIR=./blake2-sse
+#    CFLAGS += -L$(HDIR) -I$(HDIR)
+#	HASH=$(HDIR)/blake2s.c
+#	HASHIMPL = catena-blake2s-sse.c
+#else
 	#use reference implementation
     HDIR=./blake2-ref
     CFLAGS += -L$(HDIR) -I$(HDIR)
 	HASH=$(HDIR)/blake2s-ref.c
 	HASHIMPL = catena-blake2s-ref.c
-endif
+#endif
 
 #if requested use the full hash function for H' instead of single rounds
 ifndef FULLHASH

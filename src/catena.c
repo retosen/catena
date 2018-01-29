@@ -40,6 +40,12 @@
 
 /***************************************************/
 
+void print_hlex(uint8_t *key, int len)
+{
+  int i;
+  for(i=0; i< len; i++) printf("%02x",key[i]);  puts("");
+}
+
 int __Catena(const uint8_t *pwd,   const uint32_t pwdlen,
 	     const uint8_t *salt,  const uint8_t  saltlen,
 	     const uint8_t *data,  const uint32_t datalen,
@@ -72,7 +78,9 @@ int __Catena(const uint8_t *pwd,   const uint32_t pwdlen,
   /* Compute the initial value to hash  */
   __Hash5(hv, H_LEN, t, 4, x, H_LEN, pwd,  pwdlen, salt, saltlen, x);
 
+
   Flap(x, lambda, (min_garlic+1)/2, salt, saltlen, x);
+  //print_hlex(x, 32);
 
   for(c=min_garlic; c <= garlic; c++)
   {

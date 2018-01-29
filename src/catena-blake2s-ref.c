@@ -134,17 +134,17 @@ static inline int blake2s_set_lastblock( blake2s_state *S )
   return 0;
 }
 
-/* Blake2b compression function modified to do only one single round
+/* Blake2s compression function modified to do only one single round
  */
 static inline void blake2round(blake2s_state* S,
-    const uint8_t block[BLAKE2B_BLOCKBYTES], unsigned ridx)
+    const uint8_t in[BLAKE2S_BLOCKBYTES], unsigned ridx)
 {
   uint64_t m[16];
   uint64_t v[16];
-  int i;
+  size_t i;
 
   for( i = 0; i < 16; ++i ) {
-    m[i] = load32( block + i * sizeof( m[i] ) );
+    m[i] = load32( in + i * sizeof( m[i] ) );
   }
 
   for( i = 0; i < 8; ++i )
@@ -192,8 +192,8 @@ static inline void blake2round(blake2s_state* S,
     case 7:ROUND( 7 );break;
     case 8:ROUND( 8 );break;
     case 9:ROUND( 9 );break;
-  //  case 10:ROUND( 10 );break;
-  //  case 11:ROUND( 11 );break;
+    //case 10:ROUND( 10 );break;
+    //case 11:ROUND( 11 );break;
   }
 
  for( i = 0; i < 8; ++i )
@@ -203,13 +203,13 @@ static inline void blake2round(blake2s_state* S,
 #undef ROUND
 }
 
-/* Single round of Blake2b that hashes two 512bit inputs to one 512bit hash
+/* Single round of Blake2s that hashes two 256bit inputs to one 256bit hash
 *  The round that is used is determined by the current vertex index(vindex).
 *  A single state is used for every consecutive call.
 */
 void __HashFast(int vindex, const uint8_t* i1,
        const uint8_t* i2, uint8_t hash[H_LEN]){
-  uint8_t buffer[BLAKE2B_OUTBYTES];
+  uint8_t buffer[BLAKE2S_OUTBYTES];
 
   memcpy(_state.buf, i1, H_LEN);
   memcpy(_state.buf + H_LEN, i2, H_LEN);
@@ -217,11 +217,11 @@ void __HashFast(int vindex, const uint8_t* i1,
   blake2s_increment_counter(&_state, _state.buflen);
   blake2s_set_lastblock(&_state);
   //No Padding necessary because the last 1024bits of _state.buf are 0 anyways
-  const int rindex = vindex % 12;
+  const int rindex = vindex % 10;
   blake2round(&_state, _state.buf, rindex);
 
   for( int i = 0; i < 8; ++i ) /* Output full hash to temp buffer */
-    store64( buffer + sizeof(_state.h[i] ) * i, _state.h[i] );
+    store32( buffer + sizeof(_state.h[i] ) * i, _state.h[i] );
 
   memcpy(hash, buffer, H_LEN );
 }
